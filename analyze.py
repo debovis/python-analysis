@@ -1,18 +1,13 @@
 from pymongo import Connection
-from sklearn.cross_validation import train_test_split
 
-
-import logging
+import logging,sys
 import numpy as np
-from optparse import OptionParser
-import sys
 from time import time
 import pylab as pl
 from collections import Counter
 
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import HashingVectorizer
+from sklearn.cross_validation import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer,HashingVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.linear_model import RidgeClassifier
 from sklearn.svm import LinearSVC
@@ -22,9 +17,19 @@ from sklearn import metrics
 
 class analyze():
 	def __init__(self):
+		"""
+			Use analyze class to generate classifier
+			Create classifier for different categories
+
+			Create webapp that has a genie page that will hit api that will take text and give a perdicted rating
+			also has a page 
+		"""
 		self.conn = Connection()['citypaper']
 
-	def classify(self,X,Y):
+		self.svcAllTags()
+
+
+	def classifyWithReport(self,X,Y, presist=False):
 		# create transformed train/test with tfidfvectorizer to go from string to float
 		vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=0.5,stop_words='english')
 		X_transformed = vectorizer.fit_transform(X)
@@ -77,6 +82,35 @@ class analyze():
 		print 
 		clf_descr = str(clf).split('(')[0]
 		print clf_descr, train_time, test_time
+		if persist:
+			pass
+			# pickle here
+
+	def createClassifier(self,X,Y, presist=False):
+		# create transformed train/test with tfidfvectorizer to go from string to float
+		self.vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=0.5,stop_words='english')
+		X_transformed = self.vectorizer.fit_transform(X)
+
+		# split test/train
+		X_train, X_test, Y_train, Y_test = train_test_split(X_transformed, Y, test_size=0.33, random_state=42)
+
+		feature_names = np.asarray(self.vectorizer.get_feature_names())
+		categories = ["1","2","3","4","5"]
+
+		# create classifier
+		clf = LinearSVC(penalty="l1", dual=False, tol=1e-3)
+		clf.fit(X_train, Y_train)
+		return clf
+
+		# pred = clf.predict(X_test)
+		# top10 = np.argsort(clf.coef_[i])[-10:]
+		# print "%s: %s" % (category, " ".join(feature_names[top10]))
+
+	def predictText(self,text):
+		training = self.vectorizer.transform( [text] )
+		print training.shape[0], len([t for t in text.split(' ')])
+		pred = self.clf.predict(training)
+		return int(pred[0])
 
 	def svcAllTags(self, acceptedTags = ['Music Venue', 'Bar']):
 
@@ -91,12 +125,12 @@ class analyze():
 			tags = [ tag[1].encode('ascii', 'ignore')	for tag in rest['details'].get('parsedTags')]
 
 			# does the rest have the tags we are interested in
-			if list( set(tags) & set(acceptedTags) ):
-				if rest.get('reviews'):
-					for review in rest['reviews']:
-						if review.get('rating'):
-							rests[oid]['x'].append( review.get('text'))
-							rests[oid]['y'].append( int(review.get('rating')))
+			#if list( set(tags) & set(acceptedTags) ):
+			if rest.get('reviews'):
+				for review in rest['reviews']:
+					if review.get('rating'):
+						rests[oid]['x'].append( review.get('text'))
+						rests[oid]['y'].append( int(review.get('rating')))
 
 		X = []
 		Y = []
@@ -104,8 +138,8 @@ class analyze():
 			[ X.append( review ) for review in item['x'] ]
 			[ Y.append( rating ) for rating in item['y'] ]
 
-		print X[:4], Y[:4]
-		self.classify(X,Y)
+		# print X[:4], Y[:4]
+		self.clf = self.createClassifier(X,Y)
 		
 
 	def findAllTags(self):
