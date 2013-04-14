@@ -1,6 +1,6 @@
 from pymongo import Connection
 
-import logging,sys,simplejson
+import logging,sys,simplejson,os
 import numpy as np
 from time import time
 import pylab as pl
@@ -22,7 +22,9 @@ class analyze():
 			Create classifier for different categories
 		"""
 		#self.conn = Connection()['citypaper']
-		configFileLocation = '/home/debovis/workspace/conf/citypaper.json'
+		configFileLocation = configFile = 'python-analysis.json'
+		if len(os.listdir('/home'))>0:
+			configFileLocation = '/home/debovis/workspace/conf/{0}'.format(configFile)
 		config = None
 		try:
 			config = simplejson.load(open(configFileLocation, 'r'))['mongolab']
@@ -108,13 +110,8 @@ class analyze():
 		clf.fit(X_train, Y_train)
 		return clf
 
-		# pred = clf.predict(X_test)
-		# top10 = np.argsort(clf.coef_[i])[-10:]
-		# print "%s: %s" % (category, " ".join(feature_names[top10]))
-
 	def predictText(self,text):
 		training = self.vectorizer.transform( [text] )
-		print training.shape[0], len([t for t in text.split(' ')])
 		pred = self.clf.predict(training)
 		return int(pred[0])
 
