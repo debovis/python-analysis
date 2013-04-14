@@ -22,7 +22,7 @@ class analyze():
 			Create classifier for different categories
 		"""
 		#self.conn = Connection()['citypaper']
-		configFileLocation = 'python-analysis.json'
+		configFileLocation = '/home/debovis/workspace/conf/citypaper.json'
 		config = None
 		try:
 			config = simplejson.load(open(configFileLocation, 'r'))['mongolab']
@@ -70,7 +70,7 @@ class analyze():
 
 		if hasattr(clf, 'coef_'):
 		    print "dimensionality: %d" % clf.coef_.shape[1]
-		    print "density: %f" % density(clf.coef_) 
+		    print "density: %f" % density(clf.coef_)
 
 		    if feature_names is not None:
 		        print "top 10 keywords per class:"
@@ -78,14 +78,14 @@ class analyze():
 		            top10 = np.argsort(clf.coef_[i])[-10:]
 		            print "%s: %s" % (category, " ".join(feature_names[top10]))
 
-		print "classification report:" 
+		print "classification report:"
 		print metrics.classification_report(Y_test, pred,target_names=categories)
 
 
 		print "confusion matrix:"
 		print metrics.confusion_matrix(Y_test, pred)
 
-		print 
+		print
 		clf_descr = str(clf).split('(')[0]
 		print clf_descr, train_time, test_time
 		if persist:
@@ -146,7 +146,7 @@ class analyze():
 
 		# print X[:4], Y[:4]
 		self.clf = self.createClassifier(X,Y)
-		
+
 
 	def findAllTags(self):
 		tagSet = []
@@ -158,7 +158,7 @@ class analyze():
 				s.append(finalTag)
 				tagSet.append(finalTag.encode('ascii', 'ignore') )
 			print rest['name'],s
-		
+
 		# for (name,count) in  Counter(tagSet).most_common():
 		# 	print "{0},{1}".format(name,count)
 
