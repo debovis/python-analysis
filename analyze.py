@@ -1,6 +1,6 @@
 from pymongo import Connection
 
-import logging,sys
+import logging,sys,simplejson
 import numpy as np
 from time import time
 import pylab as pl
@@ -20,11 +20,17 @@ class analyze():
 		"""
 			Use analyze class to generate classifier
 			Create classifier for different categories
-
-			Create webapp that has a genie page that will hit api that will take text and give a perdicted rating
-			also has a page 
 		"""
-		self.conn = Connection()['citypaper']
+		#self.conn = Connection()['citypaper']
+		configFileLocation = 'python-analysis.json'
+		config = None
+		try:
+			config = simplejson.load(open(configFileLocation, 'r'))['mongolab']
+		except Exception,e:
+			raise Exception('error loading configfile located at {0} {1}'.format(configFileLocation,e))
+
+		self.conn = Connection(host=config['host'], port=config['port'])[config['database']]
+		self.conn.authenticate(config["username"], config["password"])
 
 		self.svcAllTags()
 

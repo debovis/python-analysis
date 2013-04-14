@@ -22,11 +22,11 @@ def jsonp(f):
 @app.route('/test')
 def testClassifier():
 	text = request.args['text'] if request.args['text'] else ''
+	result = dict(prediction=0)
 	if text:
-		result = app.classifier.predictText(text)
-		return jsonify(prediction=result)
-	else:
-		return jsonify(prediction=0)
+		result['prediction'] = app.classifier.predictText(text)
+	
+	return jsonify( result )
 
 
 if __name__ == '__main__':
