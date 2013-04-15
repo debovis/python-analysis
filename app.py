@@ -25,8 +25,11 @@ def testClassifier():
 	result = dict(prediction=0)
 	if text:
 		result['prediction'] = app.classifier.predictText(text)
-	
 	return jsonify( result )
+
+@app.route('/ask')
+def askTheG():
+	return render_template('genius.html')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,58 @@
+
+
+ 
+
+{% extends "base.html" %}
+{% block title %}Ask the Genius{% endblock %}
+{% block head %}
+	{{ super() }}
+{% endblock %}
+{% block nav %}
+	{{ super() }}
+{% endblock %}
+
+{% block script %}
+	{{ super() }}
+	<script>
+	$(function () {
+
+		$('#content').keyup(function() { 
+
+			var testString = $('#content').val()
+
+			if(testString){
+
+				$.ajax({
+					url: "/test",
+					type: "GET",
+					contentType: "application/json",
+					dataType: "json",
+					data: { text: $('#content').val() },
+					success: function(js) {
+						console.log(js)
+						if(js.prediction){
+							$('#result').empty();
+							$('#result').html("<p>Result: " + js.prediction + ' </p>')
+						} else {
+							console.log('no prediction returned')
+						}
+					},
+					error: function(response){
+						$('#result').html("");
+					}
+				})
+			} else {
+				$('#result').empty();
+			}
+		})
+	});
+	</script>
+
+
+{% endblock%}
+
+{% block content %}
+<textarea id="content" value="" style="width:600px;height:200px"/></textarea>
+<div id="result" style="width:100px"> </div>
+
+{% endblock%}
