@@ -32,7 +32,7 @@
 						console.log(js)
 						if(js.prediction){
 							$('#result').empty();
-							$('#result').html("<p>Result: " + js.prediction + ' </p>')
+							$('#result').html("<p>Recommendation (0-5): " + js.prediction + ' </p>')
 						} else {
 							console.log('no prediction returned')
 						}
@@ -52,6 +52,9 @@
 {% endblock%}
 
 {% block content %}
+<p>
+	DeBovis Review to Rating Prediction: </br> API utilizes Charleston Restaurant Reviews. Enter some text and try it out! 
+</p>
 <textarea id="content" value="" style="width:600px;height:200px"/></textarea>
 <div id="result" style="width:100px"> </div>
 
