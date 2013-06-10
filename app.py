@@ -22,12 +22,13 @@ def jsonp(f):
 @app.route('/test')
 def testClassifier():
 	text = request.args['text'] if request.args['text'] else ''
+    # TODO: strip out illegal CHARS
 	result = dict(prediction=0)
 	if text:
 		result['prediction'] = app.classifier.predictText(text)
 	return jsonify( result )
 
-@app.route('/ask')
+@app.route('/')
 def askTheG():
 	return render_template('genius.html')
 

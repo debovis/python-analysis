@@ -17,11 +17,8 @@
 	$(function () {
 
 		$('#content').keyup(function() { 
-
-			var testString = $('#content').val()
-
+			var testString = $('#content').val();
 			if(testString){
-
 				$.ajax({
 					url: "/test",
 					type: "GET",
